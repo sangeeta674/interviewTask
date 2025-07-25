@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:social/create/createVideo.dart';
 import 'package:social/provider/providers.dart';
 
 import '../home/home.dart';
 
-class ConfigApp extends StatelessWidget {
-  const ConfigApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class ConfigApp extends StatelessWidget {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink),
         ),
-        home: HomePage(),
+        home: CreateVideo(),
       ),
     );
   }

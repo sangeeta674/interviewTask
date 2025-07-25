@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:ffmpeg_kit_min_gpl/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_min_gpl/return_code.dart';
 import 'package:flutter/material.dart';
@@ -16,11 +17,13 @@ class SongsListProvider with ChangeNotifier {
   SongsListProvider();
 
   bool _isFetching = false;
-
   bool get isFetching => _isFetching;
 
-  Future<List<SongsData>> fetchSongs() async {
-    List<SongsData> songsData = [];
+  List<SongsData> _songsData = [];
+  List<SongsData> get songsData => _songsData;
+
+  Future<void> fetchSongs() async {
+    
     _isFetching = true;
     notifyListeners();
 
@@ -40,8 +43,8 @@ class SongsListProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-        songsData = SongsListModel.fromJson(json).data!;
-        Constants.logger.w(songsData[0].soundList![0].sound!);
+        _songsData = SongsListModel.fromJson(json).data!;
+        Constants.logger.w(_songsData[0].soundList![0].sound!);
       }
     } catch (e) {
       Constants.logger.d('Error: $e');
@@ -49,7 +52,6 @@ class SongsListProvider with ChangeNotifier {
 
     _isFetching = false;
     notifyListeners();
-    return songsData;
   }
 
   Future<File> downloadSong(String url, String fileName) async {
@@ -64,10 +66,22 @@ class SongsListProvider with ChangeNotifier {
     required File videoFile,
     required File audioFile,
   }) async {
-    // Request permission
-    final permission = await Permission.videos.request();
-    if (!permission.isGranted) {
-      throw Exception('Permission denied to access media storage');
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    Constants.logger.w(androidInfo.version.sdkInt.toString());
+
+    if (androidInfo.version.sdkInt >= 33) {
+      // Request permission
+      final permission = await Permission.videos.request();
+      if (!permission.isGranted) {
+        throw Exception('Permission denied to access media storage');
+      }
+    } else {
+      // Request permission
+      final permission = await Permission.storage.request();
+      if (!permission.isGranted) {
+        throw Exception('Permission denied to access media storage');
+      }
     }
 
     final status = await Permission.manageExternalStorage.request();
