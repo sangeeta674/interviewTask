@@ -20,7 +20,6 @@ class VideoPlayerScreen extends StatefulWidget {
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   VideoPlayerController? _controller;
-  TextEditingController _searchController = TextEditingController();
   bool _isPlaying = true;
   final FocusNode _focusNode = FocusNode();
   bool _hasFocus = false;
@@ -37,13 +36,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     super.initState();
     audioPlayer = AudioPlayer();
     Provider.of<SongsListProvider>(context, listen: false).fetchSongs();
-    // Provider.of<SongProvider>(context, listen: false).getPlaylist();
-    // Provider.of<SongProvider>(context, listen: false);
     if (widget.videoFile != null) {
       _controller = VideoPlayerController.file(File(widget.videoFile!.path))
         ..initialize().then((_) {
           setState(() {
             _controller!.play();
+            // _controller.setVolume(0.0);
             _controller!.setLooping(true);
           }); // Auto play video when initialized
         });

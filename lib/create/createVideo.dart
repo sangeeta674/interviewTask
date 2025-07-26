@@ -34,9 +34,6 @@ class _CreateVideoState extends State<CreateVideo> {
     });
 
     if (_videoFile != null) {
-      // getIt<ConfigRouter>().push(
-      //   VideoPlayerRouter(videoFile: _videoFile),
-      // );
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -58,9 +55,7 @@ class _CreateVideoState extends State<CreateVideo> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text('Select Video'),
-        
+        backgroundColor: Colors.black,        
       ),
       body: Center(
        
@@ -85,8 +80,16 @@ class _CreateVideoState extends State<CreateVideo> {
           borderRadius: BorderRadius.circular(10.0),
           borderSide: BorderSide(color: Colors.white),
         ),
-        onPressed: _recordVideoFromCamera, // define this function
+          // define this function
         color: Colors.black,
+        onPressed: () { 
+           Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CustomCameraScreen(),
+        ),
+      );
+         },
         child: Text(
           'Open Camera for Recording',
           style: TextStyle(color: Colors.white),
