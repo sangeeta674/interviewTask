@@ -121,36 +121,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     aspectRatio: _controller!.value.aspectRatio,
                     child: VideoPlayer(_controller!),
                   )
-                : CircularProgressIndicator(),
+                : Center(child: CircularProgressIndicator()),
           ),
         ],
       ),
 
-      // floatingActionButton: MaterialButton(
-      //   shape: OutlineInputBorder(
-      //     borderRadius: BorderRadius.circular(10.0),
-      //     borderSide: BorderSide(
-      //       color: Colors.blue,
-      //       width: 1.0,
-      //     ),
-      //   ),
-      //   onPressed: () {
-
-      //     print(widget.videoFile);
-      //      Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => VideoPlayerScreen(videoFile: widget.videoFile),
-      //   ),
-      // );
-      //   },
-      //   child: Text(
-      //     'marge video',
-      //     style: TextStyle(
-      //       fontSize: 18.0,
-      //     ),
-      //   ),
-      // ),
       floatingActionButton: MaterialButton(
         onPressed: () async {
           if (widget.videoFile == null || audioFile == null) {
@@ -160,8 +135,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             return;
           }
 
-          Constants.logger.w('Video ==============> '+widget.videoFile!.path);
-          Constants.logger.w('Audio ==============> '+audioFile!.path);
+          Constants.logger.w('Video ==============> ' + widget.videoFile!.path);
+          Constants.logger.w('Audio ==============> ' + audioFile!.path);
 
           final code = await songsProvider.mergeVideoWithAudio(
             videoFile: widget.videoFile!,
@@ -196,128 +171,165 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   void showCustomSongBottomSheet(
-  BuildContext context,
-  SongsListProvider songList,
-) {
-  final AudioPlayer _audioPlayer = AudioPlayer();
+    BuildContext context,
+    SongsListProvider songList,
+  ) {
+    final AudioPlayer _audioPlayer = AudioPlayer();
 
-  showModalBottomSheet(
-    context: context,
-    backgroundColor: Colors.transparent,
-    isScrollControlled: true,
-    builder: (context) {
-      return StatefulBuilder(
-        builder: (context, setModalState) {
-          return DraggableScrollableSheet(
-            initialChildSize: 0.5,
-            minChildSize: 0.4,
-            maxChildSize: 0.9,
-            builder: (context, controller) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[800],
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Center(
-                        child: Text(
-                          'Songs',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.5,
+              minChildSize: 0.4,
+              maxChildSize: 0.9,
+              builder: (context, controller) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[800],
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: Center(
+                          child: Text(
+                            'Songs',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    songList.isFetching
-                        ? Center(child: CircularProgressIndicator())
-                        : Expanded(
-                            child: ListView.builder(
-                              controller: controller,
-                              itemCount: songList.songsData[8].soundList!.length,
-                              itemBuilder: (context, index) {
-                                final song = songList.songsData[8].soundList![index];
-                                return ListTile(
-                                  leading: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.network(
-                                      Constants.baseSongURL + song.soundImage!,
-                                      width: 50,
-                                      height: 50,
-                                      fit: BoxFit.cover,
+                      songList.isFetching
+                          ? Center(child: CircularProgressIndicator())
+                          : Expanded(
+                              child: ListView.builder(
+                                controller: controller,
+                                itemCount:
+                                    songList.songsData[8].soundList!.length,
+                                itemBuilder: (context, index) {
+                                  final song =
+                                      songList.songsData[8].soundList![index];
+                                  return ListTile(
+                                    leading: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Image.network(
+                                        Constants.baseSongURL +
+                                            song.soundImage!,
+                                        width: 50,
+                                        height: 50,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
-                                  ),
-                                  title: Text(
-                                    song.soundTitle!,
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        song.producers!,
-                                        style: TextStyle(color: Colors.grey),
-                                      ),
-                                      Text(
-                                        song.duration!,
-                                        style: TextStyle(color: Colors.grey),
-                                      ),
-                                    ],
-                                  ),
-                                  trailing: downloadingIndex == index
-                                      ? SizedBox(
-                                          height: 24,
-                                          width: 24,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
-                                        )
-                                      : !downloadedFiles.containsKey(index)
-                                          ? IconButton(
-                                              icon: Icon(Icons.save_alt_outlined, color: Colors.white),
-                                              onPressed: () async {
-                                                setModalState(() => downloadingIndex = index);
-                                                final file = await startDownload(
-                                                  Constants.baseSongURL + song.sound!,
-                                                  song.soundId!.toString(),
-                                                );
-                                                downloadedFiles[index] = file;
-                                                audioFile = file; // Set selected audio
-                                                _audioPlayer.setFilePath(file.path);
-                                                setModalState(() => downloadingIndex = null);
-                                              },
-                                            )
-                                          : IconButton(
-                                              icon: Icon(
-                                                playingIndex == index ? Icons.pause : Icons.play_arrow,
-                                                color: Colors.white,
-                                              ),
-                                              onPressed: () {
-                                                if (playingIndex == index) {
-                                                  _audioPlayer.pause();
-                                                  setModalState(() => playingIndex = null);
-                                                } else {
-                                                  _audioPlayer.play();
-                                                  setModalState(() => playingIndex = index);
-                                                }
-                                              },
-                                            ),
-                                            
-                                );
-                              },
-                            ),
-                          ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-      );
-    },
-  );
+                                    onTap: () async {
+                                     await _controller!.setVolume(0.0);
+                                     await _audioPlayer.setFilePath(audioFile!.path);
 
+                                      Navigator.pop(context);
+                                     await _controller!.play();
+                                     await _audioPlayer.play();
+                                     setState(() {
+                                       isPlaying=true;
+                                     });
+
+                                    },
+                                    title: Text(
+                                      song.soundTitle!,
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          song.producers!,
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                        Text(
+                                          song.duration!,
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                      ],
+                                    ),
+                                    trailing: downloadingIndex == index
+                                        ? SizedBox(
+                                            height: 24,
+                                            width: 24,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : !downloadedFiles.containsKey(index)
+                                        ? IconButton(
+                                            icon: Icon(
+                                              Icons.save_alt_outlined,
+                                              color: Colors.white,
+                                            ),
+                                            onPressed: () async {
+                                              setModalState(
+                                                () => downloadingIndex = index,
+                                              );
+                                              final file = await startDownload(
+                                                Constants.baseSongURL +
+                                                    song.sound!,
+                                                song.soundId!.toString(),
+                                              );
+                                              downloadedFiles[index] = file;
+                                              setState(() {
+                                                audioFile =
+                                                  file; // Set selected audio
+                                              });
+                                              _audioPlayer.setFilePath(
+                                                file.path,
+                                              );
+                                              setModalState(
+                                                () => downloadingIndex = null,
+                                              );
+                                            },
+                                          )
+                                        : IconButton(
+                                            icon: Icon(
+                                              playingIndex == index
+                                                  ? Icons.pause
+                                                  : Icons.play_arrow,
+                                              color: Colors.white,
+                                            ),
+                                            onPressed: () {
+                                              if (playingIndex == index) {
+                                                _audioPlayer.pause();
+                                                setModalState(
+                                                  () => playingIndex = null,
+                                                );
+                                              } else {
+                                                _audioPlayer.play();
+                                                setModalState(
+                                                  () => playingIndex = index,
+                                                );
+                                              }
+                                            },
+                                          ),
+                                  );
+                                },
+                              ),
+                            ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
   }
 }
