@@ -72,7 +72,7 @@ class _MargeVideoPlayerState extends State<MargeVideoPlayer> {
                   aspectRatio: _controller!.value.aspectRatio,
                   child: VideoPlayer(_controller!),
                 )
-              : CircularProgressIndicator(),
+              : Center(child: CircularProgressIndicator()),
         ),
       ]),
       // floatingActionButton: MaterialButton(

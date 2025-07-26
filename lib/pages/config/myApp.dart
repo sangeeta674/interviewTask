@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:social/create/createVideo.dart';
 import 'package:social/provider/providers.dart';
 
-import '../home/home.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
